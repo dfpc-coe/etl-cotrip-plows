@@ -1,5 +1,5 @@
 {
-    "name": "cotrip-plows",
+    "name": "coe-cotrip-plows",
     "type": "module",
     "prviate": true,
     "version": "1.0.0",
@@ -9,5 +9,9 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Nick Ingalls <nick@ingalls.ca>",
-    "license": "ISC"
+    "license": "ISC",
+    "devDependencies": {
+        "@mapbox/cloudfriend": "^6.0.0",
+        "@openaddresses/deploy": "^7.5.0"
+    }
 }

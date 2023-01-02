@@ -1,0 +1,16 @@
+{
+    "name": "coe-etl-task-cotrip-plows",
+    "profile": "coe",
+    "tags": [
+        {
+            "Key": "Project",
+            "Value": "etl"
+        },
+        "Owner"
+    ],
+    "artifacts": {
+        "docker": [
+            "coe-ecr-etl-tasks:{{project}}-{{gitsha}}"
+        ]
+    }
+}
