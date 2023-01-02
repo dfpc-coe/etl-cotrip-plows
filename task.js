@@ -74,8 +74,11 @@ export default class Task {
     }
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+export async function handler() {
     const task = new Task();
-    task.control();
+    await task.control();
 }
+
+if (import.meta.url === `file://${process.argv[1]}`) handler();
+
 
