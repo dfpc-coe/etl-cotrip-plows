@@ -21,7 +21,7 @@ jobs:
           ref: ${{github.event.pull_request.head.sha || github.sha}}
 
       - name: Docker Build ETL
-        run: docker build -t etl etl/
+        run: docker build -t etl .
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
