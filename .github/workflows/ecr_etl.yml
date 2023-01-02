@@ -2,15 +2,8 @@ name: AWS ECR ETL
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
-
+    tags:
+      - '*'
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -30,12 +23,16 @@ jobs:
           aws-secret-access-key: ${{secrets.AWS_SECRET_ACCESS_KEY}}
           aws-region: us-east-1
 
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Docker Tag ETL
-        run: docker tag etl ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/coe-ecr-etl-tasks:${{github.event.repository.name}}-${{github.event.pull_request.head.sha || github.sha}}
+        run: docker tag etl ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/coe-ecr-etl-tasks:${{github.event.repository.name}}-${{steps.tag.outputs.tag}}
 
       - name: Docker Push ETL
-        run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/coe-ecr-etl-tasks:${{github.event.repository.name}}-${{github.event.pull_request.head.sha || github.sha}}
+        run: docker push ${{secrets.AWS_ACCOUNT_ID}}.dkr.ecr.us-east-1.amazonaws.com/coe-ecr-etl-tasks:${{github.event.repository.name}}-${{steps.tag.outputs.tag}}

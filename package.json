@@ -6,6 +6,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
+        "lint": "eslint *.js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Nick Ingalls <nick@ingalls.ca>",
@@ -13,5 +14,9 @@
     "devDependencies": {
         "@mapbox/cloudfriend": "^6.0.0",
         "@openaddresses/deploy": "^7.5.0"
+    },
+    "dependencies": {
+        "eslint": "^8.31.0",
+        "eslint-plugin-node": "^11.1.0"
     }
 }
