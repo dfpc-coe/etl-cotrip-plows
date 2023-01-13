@@ -33,7 +33,7 @@ export default class Task {
         let batch = -1;
         let res;
         do {
-            console.error(`ok - fetching ${++batch} of plows`);
+            console.log(`ok - fetching ${++batch} of plows`);
             const url = new URL('/api/v1/snowPlows', this.api);
             url.searchParams.append('apiKey', this.token);
             if (res) url.searchParams.append('offset', res.headers.get('next-offset'));
@@ -77,7 +77,7 @@ export default class Task {
             body: JSON.stringify(features)
         });
 
-        console.error(await post.json());
+        console.log(await post.json());
     }
 }
 
