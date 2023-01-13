@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.0.1
+
+- :arrow_up: Update core deps
+
 ### v1.0.0
 
 - :tada: Initial Commit
