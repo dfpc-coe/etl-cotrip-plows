@@ -15,13 +15,17 @@ export default class Task {
     constructor() {
         this.token = process.env.COTRIP_TOKEN;
         this.api = 'https://data.cotrip.org/';
-        this.etl = process.env.ETL_API;
-        this.layer = process.env.ETL_LAYER;
-        this.token = process.env.ETL_TOKEN;
+
+        this.etl = {
+            api: process.env.ETL_API,
+            layer: process.env.ETL_LAYER,
+            token: process.env.ETL_TOKEN
+        };
+
         if (!this.token) throw new Error('No COTrip API Token Provided');
-        if (!this.etl) throw new Error('No ETL API URL Provided');
-        if (!this.layer) throw new Error('No ETL Layer Provided');
-        if (!this.token) throw new Error('No ETL Token Provided');
+        if (!this.etl.api) throw new Error('No ETL API URL Provided');
+        if (!this.etl.layer) throw new Error('No ETL Layer Provided');
+        if (!this.etl.token) throw new Error('No ETL Token Provided');
     }
 
     async control() {
@@ -64,10 +68,10 @@ export default class Task {
             })
         };
 
-        const post = await fetch(new URL(`/api/layer/${this.layer}/cot`, this.etl), {
+        const post = await fetch(new URL(`/api/layer/${this.etl.layer}/cot`, this.etl.api), {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${this.token}`,
+                'Authorization': `Bearer ${this.etl.token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(features)
