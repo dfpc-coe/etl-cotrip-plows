@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.1.0
+
+- :rocket: Bearer Token Support
+
 ### v1.0.1
 
 - :arrow_up: Update core deps
