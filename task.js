@@ -17,9 +17,11 @@ export default class Task {
         this.api = 'https://data.cotrip.org/';
         this.etl = process.env.ETL_API;
         this.layer = process.env.ETL_LAYER;
+        this.token = process.env.ETL_TOKEN;
         if (!this.token) throw new Error('No COTrip API Token Provided');
         if (!this.etl) throw new Error('No ETL API URL Provided');
         if (!this.layer) throw new Error('No ETL Layer Provided');
+        if (!this.token) throw new Error('No ETL Token Provided');
     }
 
     async control() {
@@ -65,6 +67,7 @@ export default class Task {
         const post = await fetch(new URL(`/api/layer/${this.layer}/cot`, this.etl), {
             method: 'POST',
             headers: {
+                'Authorization': `Bearer ${this.token}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(features)
