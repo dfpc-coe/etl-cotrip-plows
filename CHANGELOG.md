@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.1.1
+
+- :bug: Fix API Token overwrite
+
 ### v1.1.0
 
 - :rocket: Bearer Token Support
