@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.2.0
+
+- :rocket: Throw a hard error if a POST to the ETL server fails
+
 ### v1.1.1
 
 - :bug: Fix API Token overwrite
