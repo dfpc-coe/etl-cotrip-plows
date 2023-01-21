@@ -77,7 +77,12 @@ export default class Task {
             body: JSON.stringify(features)
         });
 
-        console.log(await post.json());
+        if (!post.ok) {
+            console.error(await post.text());
+            throw new Error('Failed to post layer to ETL');
+        } else {
+            console.log(await post.json());
+        }
     }
 }
 
