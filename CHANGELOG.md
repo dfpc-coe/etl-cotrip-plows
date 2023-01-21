@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.2.1
+
+- :bug: Forgot to commit new POST check
+
 ### v1.2.0
 
 - :rocket: Throw a hard error if a POST to the ETL server fails
