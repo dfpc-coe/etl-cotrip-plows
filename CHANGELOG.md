@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.3.1
+
+- :bug: Adjust environment key name
+
 ### v1.3.0
 
 - :tada: Add Schema Environment Support
