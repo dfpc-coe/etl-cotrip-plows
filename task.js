@@ -28,6 +28,24 @@ export default class Task {
         if (!this.etl.token) throw new Error('No ETL Token Provided');
     }
 
+    static schema() {
+        return {
+            type: 'object',
+            required: ['COTRIP_TOKEN'],
+            properties: {
+                'ADSBX_TOKEN': {
+                    type: 'string',
+                    description: 'API Token for CoTrip'
+                },
+                'DEBUG': {
+                    type: 'boolean',
+                    default: false,
+                    description: 'Print GeoJSON Features in logs'
+                }
+            }
+        };
+    }
+
     async control() {
         const plows = [];
         let batch = -1;
@@ -86,9 +104,14 @@ export default class Task {
     }
 }
 
-export async function handler() {
-    const task = new Task();
-    await task.control();
+export async function handler(event = {}) {
+    if (event.type === 'schema') {
+        return Task.schema();
+    } else {
+        const task = new Task();
+        await task.control();
+    }
+
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) handler();
