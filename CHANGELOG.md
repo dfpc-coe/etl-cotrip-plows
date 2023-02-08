@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.3.0
+
+- :tada: Add Schema Environment Support
+
 ### v1.2.1
 
 - :bug: Forgot to commit new POST check
