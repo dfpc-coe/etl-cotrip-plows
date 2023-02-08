@@ -33,7 +33,7 @@ export default class Task {
             type: 'object',
             required: ['COTRIP_TOKEN'],
             properties: {
-                'ADSBX_TOKEN': {
+                'COTRIP_TOKEN': {
                     type: 'string',
                     description: 'API Token for CoTrip'
                 },
