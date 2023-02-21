@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.3.2
+
+- :rocket: Update to OIDC based ECR Creds
+
 ### v1.3.1
 
 - :bug: Adjust environment key name
