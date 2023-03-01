@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.4.0
+
+- :rocket: Update to use @tak-ps/etl base
+
 ### v1.3.2
 
 - :rocket: Update to OIDC based ECR Creds
