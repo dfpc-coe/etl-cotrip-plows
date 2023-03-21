@@ -35,8 +35,8 @@ export default class Task extends ETL {
         const layer = await this.layer();
 
         const api = 'https://data.cotrip.org/';
-        if (!layer.data.environment.COTRIP_TOKEN) throw new Error('No COTrip API Token Provided');
-        const token = layer.data.environment.COTRIP_TOKEN;
+        if (!layer.environment.COTRIP_TOKEN) throw new Error('No COTrip API Token Provided');
+        const token = layer.environment.COTRIP_TOKEN;
 
         const plows = [];
         let batch = -1;
