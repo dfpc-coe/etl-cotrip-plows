@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v1.4.1
+
+- :rocket: Update environment location
+
 ### v1.4.0
 
 - :rocket: Update to use @tak-ps/etl base
