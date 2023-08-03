@@ -13,22 +13,30 @@ try {
 }
 
 export default class Task extends ETL {
-    static schema() {
-        return {
-            type: 'object',
-            required: ['COTRIP_TOKEN'],
-            properties: {
-                'COTRIP_TOKEN': {
-                    type: 'string',
-                    description: 'API Token for CoTrip'
-                },
-                'DEBUG': {
-                    type: 'boolean',
-                    default: false,
-                    description: 'Print GeoJSON Features in logs'
+    static async schema(type = 'output') {
+        if (type === 'output') {
+            return {
+                type: 'object',
+                required: ['COTRIP_TOKEN'],
+                properties: {
+                    'COTRIP_TOKEN': {
+                        type: 'string',
+                        description: 'API Token for CoTrip'
+                    },
+                    'DEBUG': {
+                        type: 'boolean',
+                        default: false,
+                        description: 'Print GeoJSON Features in logs'
+                    }
                 }
-            }
-        };
+            };
+        } else {
+            return {
+                type: 'object',
+                required: [],
+                properties: {}
+            };
+        }
     }
 
     async control() {
@@ -42,7 +50,7 @@ export default class Task extends ETL {
         let batch = -1;
         let res;
         do {
-            console.log(`ok - fetching ${++batch} of plows`);
+            console.log(`ok - fetching page ${++batch}  of plows`);
             const url = new URL('/api/v1/snowPlows', api);
             url.searchParams.append('apiKey', token);
             if (res) url.searchParams.append('offset', res.headers.get('next-offset'));
@@ -82,13 +90,14 @@ export default class Task extends ETL {
 }
 
 export async function handler(event = {}) {
-    if (event.type === 'schema') {
-        return Task.schema();
+    if (event.type === 'schema:input') {
+        return await Task.schema('input');
+    } else if (event.type === 'schema:output') {
+        return await Task.schema('output');
     } else {
         const task = new Task();
         await task.control();
     }
-
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) handler();
