@@ -14,7 +14,7 @@ try {
 
 export default class Task extends ETL {
     static async schema(type = 'input') {
-        if (type === 'output') {
+        if (type === 'inout') {
             return {
                 type: 'object',
                 required: ['COTRIP_TOKEN'],
