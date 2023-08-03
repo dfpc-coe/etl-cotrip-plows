@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.0.0
+
+- :rocket: Update to latest ETL
+
 ### v1.4.1
 
 - :rocket: Update environment location
