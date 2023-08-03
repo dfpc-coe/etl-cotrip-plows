@@ -13,7 +13,7 @@ try {
 }
 
 export default class Task extends ETL {
-    static async schema(type = 'output') {
+    static async schema(type = 'input') {
         if (type === 'output') {
             return {
                 type: 'object',
