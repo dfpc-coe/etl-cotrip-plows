@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.0.3
+
+- :bug: Fix input schema
+
 ### v2.0.2
 
 - :bug: Flip input to schema
