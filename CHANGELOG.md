@@ -10,6 +10,11 @@
 
 ## Version History
 
+### v2.1.0
+
+- :arrow_up: Update Core Deps
+- :bug: Use `id` and `id2` to generate ID as `id2` was occasionally set to `0000-0000-0000`
+
 ### v2.0.3
 
 - :bug: Fix input schema

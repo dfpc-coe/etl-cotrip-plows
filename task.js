@@ -65,7 +65,7 @@ export default class Task extends ETL {
             type: 'FeatureCollection',
             features: plows.map((plow) => {
                 const feat = {
-                    id: plow.avl_location.vehicle.id2,
+                    id: plow.avl_location.vehicle.id + '_' + plow.avl_location.vehicle.id2,
                     type: 'Feature',
                     properties: {
                         type: 'a-f-G-E-V-A-T-H',
