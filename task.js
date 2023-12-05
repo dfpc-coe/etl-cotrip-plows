@@ -23,6 +23,11 @@ export default class Task extends ETL {
                         type: 'string',
                         description: 'API Token for CoTrip'
                     },
+                    'Show Only Active': {
+                        type: 'string',
+                        description: 'Limit Plows to showing only ones that are in motion',
+                        default: true
+                    },
                     'DEBUG': {
                         type: 'boolean',
                         default: false,
@@ -34,7 +39,14 @@ export default class Task extends ETL {
             return {
                 type: 'object',
                 required: [],
-                properties: {}
+                properties: {
+                    fleet: { type: 'string' },
+                    vehicle_type: { type: 'string' },
+                    vehicle_subtype: { type: 'string' },
+                    current_status_state: { type: 'string' },
+                    current_status_info: { type: 'string' },
+                    odometer: { type: 'number' }
+                }
             };
         }
     }
@@ -63,14 +75,27 @@ export default class Task extends ETL {
 
         const features = {
             type: 'FeatureCollection',
-            features: plows.map((plow) => {
+            features: plows.filter((plow) => {
+                if (layer.environment['Show Only Active']) {
+                    return !['Inactive', 'Unknown'].includes(plow.avl_location.current_status.state);
+                } else {
+                    return true;
+                }
+            }).map((plow) => {
                 const feat = {
                     id: plow.avl_location.vehicle.id + '_' + plow.avl_location.vehicle.id2,
                     type: 'Feature',
                     properties: {
                         type: 'a-f-G-E-V-A-T-H',
                         how: 'm-g',
-                        callsign: `${plow.avl_location.vehicle.fleet} ${plow.avl_location.vehicle.type}`
+                        callsign: `${plow.avl_location.vehicle.fleet} ${plow.avl_location.vehicle.type}`,
+                        speed: plow.avl_location.position.speed * 0.44704,
+                        fleet: plow.avl_location.vehicle.fleet,
+                        vehicle_type: plow.avl_location.vehicle.type,
+                        vehicle_subtype: plow.avl_location.current_status.vehicle.subtype,
+                        current_status_state: plow.avl_location.current_status.state,
+                        current_status_info: plow.avl_location.current_status.info,
+                        odometer: plow.avl_location.position.odometer
                     },
                     geometry: {
                         type: 'Point',

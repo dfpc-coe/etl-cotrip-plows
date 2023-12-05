@@ -10,6 +10,12 @@
 
 ## Version History
 
+### v2.2.0
+
+- :arrow_up: Update Core Deps
+- :tada: Add speed support converting mph => m/s
+- :rocket: Include Schema & additional metadata
+
 ### v2.1.0
 
 - :arrow_up: Update Core Deps
