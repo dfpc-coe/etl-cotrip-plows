@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.3.0
+
+- :rocket: Also allow filtering by driving
+
 ### v2.2.2
 
 - :bug: Fix subtype

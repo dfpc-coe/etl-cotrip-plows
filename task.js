@@ -25,7 +25,12 @@ export default class Task extends ETL {
                     },
                     'Show Only Active': {
                         type: 'boolean',
-                        description: 'Limit Plows to showing only ones that are in motion',
+                        description: 'Limit Plows to showing only ones that are actively transmitting',
+                        default: true
+                    },
+                    'Show Only Driving': {
+                        type: 'boolean',
+                        description: 'Limit Plows to showing only ones that are reported as driving',
                         default: true
                     },
                     'DEBUG': {
@@ -78,6 +83,12 @@ export default class Task extends ETL {
             features: plows.filter((plow) => {
                 if (layer.environment['Show Only Active']) {
                     return !['Inactive', 'Unknown'].includes(plow.avl_location.current_status.state);
+                } else {
+                    return true;
+                }
+            }).filter((plow) => {
+                if (layer.environment['Show Only Driving']) {
+                    return plow.avl_location.current_status.info === 'Driving';
                 } else {
                     return true;
                 }
