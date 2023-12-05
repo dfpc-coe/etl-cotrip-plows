@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.2.2
+
+- :bug: Fix subtype
+
 ### v2.2.1
 
 - :bug: Change new prop to boolean

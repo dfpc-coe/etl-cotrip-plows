@@ -92,7 +92,7 @@ export default class Task extends ETL {
                         speed: plow.avl_location.position.speed * 0.44704,
                         fleet: plow.avl_location.vehicle.fleet,
                         vehicle_type: plow.avl_location.vehicle.type,
-                        vehicle_subtype: plow.avl_location.current_status.vehicle.subtype,
+                        vehicle_subtype: plow.avl_location.vehicle.subtype,
                         current_status_state: plow.avl_location.current_status.state,
                         current_status_info: plow.avl_location.current_status.info,
                         odometer: plow.avl_location.position.odometer
