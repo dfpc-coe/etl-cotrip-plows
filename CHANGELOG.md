@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.2.1
+
+- :bug: Change new prop to boolean
+
 ### v2.2.0
 
 - :arrow_up: Update Core Deps

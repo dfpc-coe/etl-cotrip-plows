@@ -24,7 +24,7 @@ export default class Task extends ETL {
                         description: 'API Token for CoTrip'
                     },
                     'Show Only Active': {
-                        type: 'string',
+                        type: 'boolean',
                         description: 'Limit Plows to showing only ones that are in motion',
                         default: true
                     },
