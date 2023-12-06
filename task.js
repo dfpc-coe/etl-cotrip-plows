@@ -1,5 +1,6 @@
 import fs from 'fs';
 import ETL from '@tak-ps/etl';
+import moment from 'moment-timezone';
 
 try {
     const dotfile = new URL('.env', import.meta.url);
@@ -49,6 +50,7 @@ export default class Task extends ETL {
                     vehicle_type: { type: 'string' },
                     vehicle_subtype: { type: 'string' },
                     current_status_state: { type: 'string' },
+                    collection_timestamp: { type: 'string' },
                     current_status_info: { type: 'string' },
                     odometer: { type: 'number' }
                 }
@@ -93,6 +95,8 @@ export default class Task extends ETL {
                     return true;
                 }
             }).map((plow) => {
+                moment(f.properties[prop]).tz('America/Denver').format('YYYY-MM-DD HH:mm z');
+
                 const feat = {
                     id: plow.avl_location.vehicle.id + '_' + plow.avl_location.vehicle.id2,
                     type: 'Feature',
@@ -106,6 +110,7 @@ export default class Task extends ETL {
                         vehicle_subtype: plow.avl_location.vehicle.subtype,
                         current_status_state: plow.avl_location.current_status.state,
                         current_status_info: plow.avl_location.current_status.info,
+                        collection_timestamp: moment(Math.floor(plow.avl_location.rtdh_timestamp * 1000)).tz('America/Denver').format('YYYY-MM-DD HH:mm z');
                         odometer: plow.avl_location.position.odometer
                     },
                     geometry: {

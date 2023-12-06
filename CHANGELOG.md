@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.4.0
+
+- :rocket: Add timezone override
+
 ### v2.3.0
 
 - :rocket: Also allow filtering by driving
