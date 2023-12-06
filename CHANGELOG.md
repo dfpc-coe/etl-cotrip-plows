@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.4.1
+
+- :bug: Fix small TS syntax error
+
 ### v2.4.0
 
 - :rocket: Add timezone override
