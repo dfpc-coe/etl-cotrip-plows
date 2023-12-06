@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.4.2
+
+- :bug: Collection Timestamp fix
+
 ### v2.4.1
 
 - :bug: Fix small TS syntax error
