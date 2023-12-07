@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.5.0
+
+- :rocket: Include 1 hour time cutoff
+
 ### v2.4.2
 
 - :bug: Collection Timestamp fix

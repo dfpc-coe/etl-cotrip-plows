@@ -94,6 +94,8 @@ export default class Task extends ETL {
                 } else {
                     return true;
                 }
+            }).filter((plow) => {
+                return moment(Math.floor(plow.avl_location.source.collection_timestamp * 1000)).isAfter(moment().subtract(1, 'hour'));
             }).map((plow) => {
                 const feat = {
                     id: plow.avl_location.vehicle.id + '_' + plow.avl_location.vehicle.id2,
