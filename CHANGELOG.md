@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v2.5.1
+
+- :arrow_up: Update Deps
+
 ### v2.5.0
 
 - :rocket: Include 1 hour time cutoff
