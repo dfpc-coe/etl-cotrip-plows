@@ -10,6 +10,10 @@
 
 ## Version History
 
+### v3.0.0
+
+- :rocket: Update to latest token strategy
+
 ### v2.5.1
 
 - :arrow_up: Update Deps
