@@ -5,7 +5,7 @@ import { Type, TSchema } from '@sinclair/typebox';
 import moment from 'moment-timezone';
 
 export default class Task extends ETL {
-    static async schema(type: SchemaType = SchemaType.Input): Promise<TSchema> {
+    async schema(type: SchemaType = SchemaType.Input): Promise<TSchema> {
         if (type === SchemaType.Input) {
             return Type.Object({
                 'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
