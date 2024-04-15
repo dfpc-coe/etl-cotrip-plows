@@ -1,4 +1,3 @@
-import fs from 'fs';
 import ETL, { Event, SchemaType, handler as internal, local, env } from '@tak-ps/etl';
 import { FeatureCollection, Feature } from 'geojson';
 import { Type, TSchema } from '@sinclair/typebox';
