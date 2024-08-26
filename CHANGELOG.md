@@ -10,6 +10,15 @@
 
 ## Version History
 
+### v3.2.0
+
+- :arrow_up: Update all deps
+- :rocket: Add bearing
+
+### v3.1.1
+
+- :bug: Schema as instance fn
+
 ### v3.1.1
 
 - :bug: Schema as instance fn

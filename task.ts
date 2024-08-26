@@ -18,8 +18,8 @@ export default class Task extends ETL {
                 vehicle_type: Type.String(),
                 vehicle_subtype: Type.String(),
                 current_status_state: Type.String(),
-                collection_timestamp: Type.String(),
                 current_status_info: Type.String(),
+                collection_timestamp: Type.String(),
                 odometer: Type.Number()
             });
         }
@@ -71,6 +71,7 @@ export default class Task extends ETL {
                         type: 'a-f-G-E-V-A-T-H',
                         how: 'm-g',
                         callsign: `${plow.avl_location.vehicle.fleet} ${plow.avl_location.vehicle.type}`,
+                        course: plow.avl_location.position.bearing,
                         speed: plow.avl_location.position.speed * 0.44704,
                         metadata: {
                             fleet: plow.avl_location.vehicle.fleet,
