@@ -10,6 +10,11 @@
 
 ## Version History
 
+### v3.3.0
+
+- :tada: Add Capabilities API
+- :arrow_up: Update all deps
+
 ### v3.2.0
 
 - :arrow_up: Update all deps

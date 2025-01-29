@@ -1,27 +1,37 @@
-import ETL, { Event, SchemaType, handler as internal, local, env } from '@tak-ps/etl';
-import { FeatureCollection, Feature } from 'geojson';
-import { Type, TSchema } from '@sinclair/typebox';
+import ETL, { Event, SchemaType, handler as internal, local, InputFeature, InputFeatureCollection, DataFlowType, InvocationType } from '@tak-ps/etl';
+import { Static, Type, TSchema } from '@sinclair/typebox';
 import moment from 'moment-timezone';
 
 export default class Task extends ETL {
-    async schema(type: SchemaType = SchemaType.Input): Promise<TSchema> {
-        if (type === SchemaType.Input) {
-            return Type.Object({
-                'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
-                'Show Only Active': Type.Boolean({ description: 'Limit Plows to showing only ones that are actively transmitting', default: true }),
-                'Show Only Driving': Type.Boolean({ description: 'Limit Plows to showing only ones that are reported as driving', default: true }),
-                'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
-            });
+    static name = 'etl-cotrip-plows';
+    static flow = [ DataFlowType.Incoming ];
+    static invocation = [ InvocationType.Schedule ];
+
+    async schema(
+        type: SchemaType = SchemaType.Input,
+        flow: DataFlowType = DataFlowType.Incoming
+    ): Promise<TSchema> {
+        if (flow === DataFlowType.Incoming) {
+            if (type === SchemaType.Input) {
+                return Type.Object({
+                    'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
+                    'Show Only Active': Type.Boolean({ description: 'Limit Plows to showing only ones that are actively transmitting', default: true }),
+                    'Show Only Driving': Type.Boolean({ description: 'Limit Plows to showing only ones that are reported as driving', default: true }),
+                    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
+                });
+            } else {
+                return Type.Object({
+                    fleet: Type.String(),
+                    vehicle_type: Type.String(),
+                    vehicle_subtype: Type.String(),
+                    current_status_state: Type.String(),
+                    current_status_info: Type.String(),
+                    collection_timestamp: Type.String(),
+                    odometer: Type.Number()
+                });
+            }
         } else {
-            return Type.Object({
-                fleet: Type.String(),
-                vehicle_type: Type.String(),
-                vehicle_subtype: Type.String(),
-                current_status_state: Type.String(),
-                current_status_info: Type.String(),
-                collection_timestamp: Type.String(),
-                odometer: Type.Number()
-            });
+            return Type.Object({});
         }
     }
 
@@ -47,7 +57,7 @@ export default class Task extends ETL {
         } while (res.headers.has('next-offset') && res.headers.get('next-offset') !== 'None');
         console.log(`ok - fetched ${plows.length} plows`);
 
-        const features: FeatureCollection = {
+        const features: Static<typeof InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: plows.filter((plow: any) => {
                 if (layer.environment['Show Only Active']) {
@@ -92,7 +102,7 @@ export default class Task extends ETL {
                     }
                 };
 
-                return feat as Feature;
+                return feat as Static<typeof InputFeature>;
             })
         };
 
@@ -100,8 +110,7 @@ export default class Task extends ETL {
     }
 }
 
-env(import.meta.url)
-await local(new Task(), import.meta.url);
+await local(new Task(import.meta.url), import.meta.url);
 export async function handler(event: Event = {}) {
-    return await internal(new Task(), event);
+    return await internal(new Task(import.meta.url), event);
 }

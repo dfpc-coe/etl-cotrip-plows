@@ -18,8 +18,8 @@
         "typescript-eslint": "^8.0.0"
     },
     "dependencies": {
-        "@sinclair/typebox": "^0.33.0",
-        "@tak-ps/etl": "^5.0.0",
+        "@sinclair/typebox": "^0.34.0",
+        "@tak-ps/etl": "^7.1.1",
         "moment-timezone": "^0.5.43"
     }
 }
