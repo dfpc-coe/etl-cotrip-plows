@@ -2,6 +2,13 @@ import ETL, { Event, SchemaType, handler as internal, local, InputFeature, Input
 import { Static, Type, TSchema } from '@sinclair/typebox';
 import moment from 'moment-timezone';
 
+const InputSchema = Type.Object({
+    'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
+    'Show Only Active': Type.Boolean({ description: 'Limit Plows to showing only ones that are actively transmitting', default: true }),
+    'Show Only Driving': Type.Boolean({ description: 'Limit Plows to showing only ones that are reported as driving', default: true }),
+    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
+});
+
 export default class Task extends ETL {
     static name = 'etl-cotrip-plows';
     static flow = [ DataFlowType.Incoming ];
@@ -13,12 +20,7 @@ export default class Task extends ETL {
     ): Promise<TSchema> {
         if (flow === DataFlowType.Incoming) {
             if (type === SchemaType.Input) {
-                return Type.Object({
-                    'COTRIP_TOKEN': Type.String({ description: 'API Token for CoTrip' }),
-                    'Show Only Active': Type.Boolean({ description: 'Limit Plows to showing only ones that are actively transmitting', default: true }),
-                    'Show Only Driving': Type.Boolean({ description: 'Limit Plows to showing only ones that are reported as driving', default: true }),
-                    'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
-                });
+                return InputSchema;
             } else {
                 return Type.Object({
                     fleet: Type.String(),
@@ -36,11 +38,11 @@ export default class Task extends ETL {
     }
 
     async control() {
-        const layer = await this.fetchLayer();
+        const env = await this.env(InputSchema);
 
         const api = 'https://data.cotrip.org/';
-        if (!layer.environment.COTRIP_TOKEN) throw new Error('No COTrip API Token Provided');
-        const token = layer.environment.COTRIP_TOKEN;
+        if (!env.COTRIP_TOKEN) throw new Error('No COTrip API Token Provided');
+        const token = env.COTRIP_TOKEN;
 
         const plows = [];
         let batch = -1;
@@ -60,13 +62,13 @@ export default class Task extends ETL {
         const features: Static<typeof InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: plows.filter((plow: any) => {
-                if (layer.environment['Show Only Active']) {
+                if (env['Show Only Active']) {
                     return !['Inactive', 'Unknown'].includes(plow.avl_location.current_status.state);
                 } else {
                     return true;
                 }
             }).filter((plow) => {
-                if (layer.environment['Show Only Driving']) {
+                if (env['Show Only Driving']) {
                     return plow.avl_location.current_status.info === 'Driving';
                 } else {
                     return true;
