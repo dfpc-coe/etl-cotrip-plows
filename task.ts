@@ -1,4 +1,5 @@
-import ETL, { Event, SchemaType, handler as internal, local, InputFeature, InputFeatureCollection, DataFlowType, InvocationType } from '@tak-ps/etl';
+import ETL, { Event, SchemaType, handler as internal, local, DataFlowType, InvocationType } from '@tak-ps/etl';
+import { Feature } from '@tak-ps/node-cot';
 import { Static, Type, TSchema } from '@sinclair/typebox';
 import moment from 'moment-timezone';
 
@@ -59,7 +60,7 @@ export default class Task extends ETL {
         } while (res.headers.has('next-offset') && res.headers.get('next-offset') !== 'None');
         console.log(`ok - fetched ${plows.length} plows`);
 
-        const features: Static<typeof InputFeatureCollection> = {
+        const features: Static<typeof Feature.InputFeatureCollection> = {
             type: 'FeatureCollection',
             features: plows.filter((plow: any) => {
                 if (env['Show Only Active']) {
@@ -104,7 +105,7 @@ export default class Task extends ETL {
                     }
                 };
 
-                return feat as Static<typeof InputFeature>;
+                return feat as Static<typeof Feature.InputFeature>;
             })
         };
 
