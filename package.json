@@ -20,6 +20,6 @@
     "dependencies": {
         "@sinclair/typebox": "^0.34.0",
         "@tak-ps/etl": "^9.0.0",
-        "moment-timezone": "^0.5.43"
+        "moment-timezone": "^0.6.0"
     }
 }
