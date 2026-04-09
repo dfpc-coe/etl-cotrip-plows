@@ -52,7 +52,10 @@ export default class Task extends ETL {
             console.log(`ok - fetching page ${++batch}  of plows`);
             const url = new URL('/api/v1/snowPlows', api);
             url.searchParams.append('apiKey', String(token));
-            if (res) url.searchParams.append('offset', res.headers.get('next-offset'));
+            if (res) {
+                const nextOffset = res.headers.get('next-offset');
+                if (nextOffset) url.searchParams.append('offset', nextOffset);
+            }
 
             res = await fetch(url);
 
