@@ -1,6 +1,7 @@
 import ETL, { Event, SchemaType, handler as internal, local, DataFlowType, InvocationType } from '@tak-ps/etl';
 import { Feature } from '@tak-ps/node-cot';
 import { Static, Type, TSchema } from '@sinclair/typebox';
+import { Value } from '@sinclair/typebox/value';
 import moment from 'moment-timezone';
 
 const InputSchema = Type.Object({
@@ -8,6 +9,36 @@ const InputSchema = Type.Object({
     'Show Only Active': Type.Boolean({ description: 'Limit Plows to showing only ones that are actively transmitting', default: true }),
     'Show Only Driving': Type.Boolean({ description: 'Limit Plows to showing only ones that are reported as driving', default: true }),
     'DEBUG': Type.Boolean({ description: 'Print GeoJSON Features in logs', default: false })
+});
+
+const Label = Type.Optional(Type.Union([Type.String(), Type.Number(), Type.Null()]));
+
+const PlowResponse = Type.Object({
+    features: Type.Array(Type.Object({
+        avl_location: Type.Object({
+            vehicle: Type.Object({
+                id: Label,
+                id2: Label,
+                fleet: Label,
+                type: Label,
+                subtype: Type.Optional(Type.Unknown())
+            }),
+            position: Type.Object({
+                latitude: Type.Optional(Type.Unknown()),
+                longitude: Type.Optional(Type.Unknown()),
+                bearing: Type.Optional(Type.Unknown()),
+                speed: Type.Optional(Type.Unknown()),
+                odometer: Type.Optional(Type.Unknown())
+            }),
+            current_status: Type.Object({
+                state: Type.Optional(Type.Unknown()),
+                info: Type.Optional(Type.Unknown())
+            }),
+            source: Type.Object({
+                collection_timestamp: Type.Optional(Type.Unknown())
+            })
+        })
+    }))
 });
 
 export default class Task extends ETL {
@@ -20,38 +51,36 @@ export default class Task extends ETL {
         flow: DataFlowType = DataFlowType.Incoming
     ): Promise<TSchema> {
         if (flow === DataFlowType.Incoming) {
-            if (type === SchemaType.Input) {
-                return InputSchema;
-            } else {
-                return Type.Object({
-                    fleet: Type.String(),
-                    vehicle_type: Type.String(),
-                    vehicle_subtype: Type.String(),
-                    current_status_state: Type.String(),
-                    current_status_info: Type.String(),
-                    collection_timestamp: Type.String(),
-                    odometer: Type.Number()
-                });
-            }
-        } else {
-            return Type.Object({});
+            if (type === SchemaType.Input) return InputSchema;
+
+            return Type.Object({
+                fleet: Type.String(),
+                vehicle_type: Type.String(),
+                vehicle_subtype: Type.String(),
+                current_status_state: Type.String(),
+                current_status_info: Type.String(),
+                collection_timestamp: Type.String(),
+                odometer: Type.Number()
+            });
         }
+
+        return Type.Object({});
     }
 
-    async control() {
+    async control(): Promise<void> {
         const env = await this.env(InputSchema);
 
         const api = 'https://data.cotrip.org/';
         if (!env.COTRIP_TOKEN) throw new Error('No COTrip API Token Provided');
         const token = env.COTRIP_TOKEN;
 
-        const plows = [];
+        const plows: Static<typeof PlowResponse>['features'] = [];
         let batch = -1;
         let res;
         do {
             console.log(`ok - fetching page ${++batch}  of plows`);
             const url = new URL('/api/v1/snowPlows', api);
-            url.searchParams.append('apiKey', String(token));
+            url.searchParams.append('apiKey', token);
             if (res) {
                 const nextOffset = res.headers.get('next-offset');
                 if (nextOffset) url.searchParams.append('offset', nextOffset);
@@ -59,56 +88,63 @@ export default class Task extends ETL {
 
             res = await fetch(url);
 
-            plows.push(...(await res.json()).features);
+            const body: unknown = await res.json();
+            if (!Value.Check(PlowResponse, body)) throw new Error('Unexpected COTrip snowPlows response');
+
+            plows.push(...body.features);
         } while (res.headers.has('next-offset') && res.headers.get('next-offset') !== 'None');
         console.log(`ok - fetched ${plows.length} plows`);
 
         const features: Static<typeof Feature.InputFeatureCollection> = {
             type: 'FeatureCollection',
-            features: plows.filter((plow: any) => {
-                if (env['Show Only Active']) {
-                    return !['Inactive', 'Unknown'].includes(plow.avl_location.current_status.state);
-                } else {
-                    return true;
-                }
+            features: plows.filter((plow) => {
+                if (!env['Show Only Active']) return true;
+
+                const { state } = plow.avl_location.current_status;
+                return !(typeof state === 'string' && ['Inactive', 'Unknown'].includes(state));
             }).filter((plow) => {
-                if (env['Show Only Driving']) {
-                    return plow.avl_location.current_status.info === 'Driving';
-                } else {
-                    return true;
-                }
+                if (!env['Show Only Driving']) return true;
+
+                return plow.avl_location.current_status.info === 'Driving';
             }).filter((plow) => {
-                return moment(Math.floor(plow.avl_location.source.collection_timestamp * 1000)).isAfter(moment().subtract(1, 'hour'));
-            }).map((plow) => {
-                const feat = {
-                    id: plow.avl_location.vehicle.id + '_' + plow.avl_location.vehicle.id2,
+                return moment(Math.floor(Number(plow.avl_location.source.collection_timestamp) * 1000)).isAfter(moment().subtract(1, 'hour'));
+            }).flatMap((plow) => {
+                const { vehicle, position, current_status, source } = plow.avl_location;
+
+                if (typeof position.longitude !== 'number' || typeof position.latitude !== 'number') {
+                    console.error(`not ok - skipping plow ${vehicle.id}_${vehicle.id2}: no position`);
+                    return [];
+                }
+
+                const feat: Static<typeof Feature.InputFeature> = {
+                    id: `${vehicle.id}_${vehicle.id2}`,
                     type: 'Feature',
                     properties: {
                         type: 'a-f-G-E-V-A-T-H',
                         how: 'm-g',
-                        callsign: `${plow.avl_location.vehicle.fleet} ${plow.avl_location.vehicle.type}`,
-                        course: plow.avl_location.position.bearing,
-                        speed: plow.avl_location.position.speed * 0.44704,
+                        callsign: `${vehicle.fleet} ${vehicle.type}`,
+                        course: typeof position.bearing === 'number' ? position.bearing : undefined,
+                        speed: Number(position.speed) * 0.44704,
                         metadata: {
-                            fleet: plow.avl_location.vehicle.fleet,
-                            vehicle_type: plow.avl_location.vehicle.type,
-                            vehicle_subtype: plow.avl_location.vehicle.subtype,
-                            current_status_state: plow.avl_location.current_status.state,
-                            current_status_info: plow.avl_location.current_status.info,
-                            collection_timestamp: moment(Math.floor(plow.avl_location.source.collection_timestamp * 1000)).tz('America/Denver').format('YYYY-MM-DD HH:mm z'),
-                            odometer: plow.avl_location.position.odometer
+                            fleet: vehicle.fleet,
+                            vehicle_type: vehicle.type,
+                            vehicle_subtype: vehicle.subtype,
+                            current_status_state: current_status.state,
+                            current_status_info: current_status.info,
+                            collection_timestamp: moment(Math.floor(Number(source.collection_timestamp) * 1000)).tz('America/Denver').format('YYYY-MM-DD HH:mm z'),
+                            odometer: position.odometer
                         }
                     },
                     geometry: {
                         type: 'Point',
                         coordinates: [
-                            plow.avl_location.position.longitude,
-                            plow.avl_location.position.latitude
+                            position.longitude,
+                            position.latitude
                         ]
                     }
                 };
 
-                return feat as Static<typeof Feature.InputFeature>;
+                return [feat];
             })
         };
 
@@ -117,6 +153,6 @@ export default class Task extends ETL {
 }
 
 await local(await Task.init(import.meta.url), import.meta.url);
-export async function handler(event: Event = {}) {
-    return await internal(await Task.init(import.meta.url), event);
+export async function handler(event: Event = {}): ReturnType<typeof internal> {
+    return internal(await Task.init(import.meta.url), event);
 }
